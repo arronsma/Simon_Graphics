@@ -1,1 +1,1 @@
-# Simon_Graphics
+# Simon's Graphics repo
