@@ -2,3 +2,6 @@
 bin/
 build/
 out/
+/LearnOpenGL
+.vs/
+x64/
