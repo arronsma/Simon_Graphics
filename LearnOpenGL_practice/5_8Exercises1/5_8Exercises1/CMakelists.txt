@@ -1,0 +1,17 @@
+cmake_minimum_required (VERSION 3.8)
+project ("OpenGLTest")
+
+set (ROOT  ../../)
+set(INC_DIR ${ROOT}/dependency/include)
+
+file(GLOB_RECURSE native_srcs ./src/*.cpp)
+
+set(SRC_LIST ${ROOT}/dependency/src/glad.c)
+
+include_directories(${INC_DIR} "./include")
+
+link_directories(${ROOT}/dependency/lib-vc2022)
+
+add_executable(OpenGLTest ${native_srcs} ${SRC_LIST})
+
+target_link_libraries(OpenGLTest glfw3)
