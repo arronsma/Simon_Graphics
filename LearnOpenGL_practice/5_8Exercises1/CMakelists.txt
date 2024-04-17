@@ -1,8 +1,11 @@
 cmake_minimum_required (VERSION 3.8)
 project ("OpenGLTest")
 
-set (ROOT  ../../)
+set (ROOT  ../)
 set(INC_DIR ${ROOT}/dependency/include)
+
+# 设置输出目录为可执行文件同级目录
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${ROOT}/bin/$<0:>")
 
 file(GLOB_RECURSE native_srcs ./src/*.cpp)
 
