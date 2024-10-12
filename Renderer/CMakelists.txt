@@ -1,0 +1,35 @@
+cmake_minimum_required (VERSION 3.8)
+project ("Renderer Project")
+
+include(ExternalProject)
+
+#install glm
+set(GLM_SOURCE_DIR ${CMAKE_SOURCE_DIR}/dependency/glm)
+ExternalProject_Add(
+    glm
+    PREFIX ${CMAKE_BINARY_DIR}/glm
+    SOURCE_DIR ${GLM_SOURCE_DIR}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/glm/install
+)
+
+ExternalProject_Get_Property(glm install_dir)
+message(${install_dir})
+include_directories(${install_dir}/install/include)
+set(INC_DIR ${CMAKE_SOURCE_DIR}/dependency/include)
+include_directories(${INC_DIR} "./include")
+
+# 设置输出目录为可执行文件同级目录
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/$<0:>")
+
+file(GLOB_RECURSE native_srcs ./src/*.cpp)
+
+set(SRC_LIST ${CMAKE_SOURCE_DIR}/dependency/src/glad.c)
+
+
+link_directories(${CMAKE_SOURCE_DIR}/dependency/lib-vc2022)
+
+add_executable(OpenGLTest ${native_srcs} ${SRC_LIST})
+
+target_link_libraries(OpenGLTest glfw3)
+
+add_dependencies(OpenGLTest glm)
