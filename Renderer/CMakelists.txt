@@ -3,7 +3,7 @@ project ("Renderer Project")
 
 include(ExternalProject)
 
-#install glm
+# install glm
 set(GLM_SOURCE_DIR ${CMAKE_SOURCE_DIR}/dependency/glm)
 ExternalProject_Add(
     glm
@@ -11,9 +11,8 @@ ExternalProject_Add(
     SOURCE_DIR ${GLM_SOURCE_DIR}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/glm/install
 )
-
+# include glm
 ExternalProject_Get_Property(glm install_dir)
-message(${install_dir})
 include_directories(${install_dir}/install/include)
 set(INC_DIR ${CMAKE_SOURCE_DIR}/dependency/include)
 include_directories(${INC_DIR} "./include")
@@ -25,7 +24,7 @@ file(GLOB_RECURSE native_srcs ./src/*.cpp)
 
 set(SRC_LIST ${CMAKE_SOURCE_DIR}/dependency/src/glad.c)
 
-
+# TODO: compile glfw
 link_directories(${CMAKE_SOURCE_DIR}/dependency/lib-vc2022)
 
 add_executable(OpenGLTest ${native_srcs} ${SRC_LIST})
