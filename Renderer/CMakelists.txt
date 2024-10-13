@@ -11,11 +11,12 @@ ExternalProject_Add(
     SOURCE_DIR ${GLM_SOURCE_DIR}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/glm/install
 )
-# include glm
+# include header
 ExternalProject_Get_Property(glm install_dir)
 include_directories(${install_dir}/install/include)
 set(INC_DIR ${CMAKE_SOURCE_DIR}/dependency/include)
 include_directories(${INC_DIR} "./include")
+include_directories(${CMAKE_SOURCE_DIR}/dependency/stb)
 
 # 设置输出目录为可执行文件同级目录
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/$<0:>")
