@@ -11,7 +11,6 @@ int main()
 {
 	Renderer r;
 	r.init();
-	r.SetFramebufferSizeCallback();
 	r.Render();
 
 	std::cout << _getcwd(NULL, 0);

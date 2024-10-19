@@ -1,13 +1,7 @@
 #include "Renderer.h"
+#include "Model/Model.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-
-
-void processInput(GLFWwindow* window)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)	//摁Esc键退出
-		glfwSetWindowShouldClose(window, true);
-}
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -18,26 +12,11 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 int Renderer::init() {
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
-	if (window == NULL)
-	{
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-	//GLFW将窗口的上下文设置为当前线程的上下文
-	glfwMakeContextCurrent(window);
-	return 0;
-}
-
-int Renderer::Render() {
-
-	//GLAD
-	 //glad: 加载所有OpenGL函数指针
+	mainWindow = new GLFWWindow();
+	mainWindow->Init(800, 600);
+	mainWindow->SetFramebufferSizeCallback(framebuffer_size_callback);
+	// Init GL Function
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Failed to initialize GLAD" << std::endl;
@@ -48,7 +27,13 @@ int Renderer::Render() {
 	const GLubyte* OpenGLVersion = glGetString(GL_VERSION);
 
 
-	std::cout << ("OpenGL实现的版本号：") << ((char*)OpenGLVersion);
+	std::cout << ("OpenGL Version") << ((char*)OpenGLVersion);
+	return 0;
+}
+
+int Renderer::Render() {
+
+
 	Shader shader("vertexShader.vs", "fragmentShader.fs");
 
 	float vertices[] = {
@@ -96,6 +81,7 @@ int Renderer::Render() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int width, height, nrChannels;
+	stbi_set_flip_vertically_on_load(true);
 	unsigned char* data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
 	if (data)
 	{
@@ -107,33 +93,44 @@ int Renderer::Render() {
 		std::cout << "Failed to load texture" << std::endl;
 	}
 
-	// 渲染循环
-	while (!glfwWindowShouldClose(window))
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+	glm::mat4 view = glm::mat4(1.0f);
+	// note that we're translating the scene in the reverse direction of where we want to move
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+	glm::mat4 projection;
+	projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+	// render loop
+	while (!mainWindow->ShouldClose())
 	{
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //状态设置
-		glClear(GL_COLOR_BUFFER_BIT); //状态使用
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //status setting
+		glClear(GL_COLOR_BUFFER_BIT); //apply setting
 		shader.use();
+		shader.setMat4("model", model);
+		shader.setMat4("view", view);
+		shader.setMat4("projection", projection);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(VAO_ID);
-		processInput(window);
+		mainWindow->ProcessInput();
 		//glDrawBuffer(VBO_ID);
 		//glDrawArrays(GL_TRIANGLES, 0, 4);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, indices);
 
-		// glfw: 交换缓冲区和轮询IO事件（按键按下/释放、鼠标移动等）
-		glfwSwapBuffers(window);
+
+		mainWindow->SwapBuffers();
 		glfwPollEvents();
 		glBindVertexArray(0);
 	}
 
-	// glfw: 回收前面分配的GLFW先关资源. 
+	// glfw: Terminate
 	glfwTerminate();
 	return 0;
 }
 
-void Renderer::SetFramebufferSizeCallback(){
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-}
+
 
 void Renderer::Loop() {
 

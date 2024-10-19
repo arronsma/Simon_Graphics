@@ -22,13 +22,14 @@ include_directories(${CMAKE_SOURCE_DIR}/dependency/stb)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/$<0:>")
 
 file(GLOB_RECURSE native_srcs ./src/*.cpp)
+file(GLOB_RECURSE native_headers ./src/*.h)
 
 set(SRC_LIST ${CMAKE_SOURCE_DIR}/dependency/src/glad.c)
 
 # TODO: compile glfw
 link_directories(${CMAKE_SOURCE_DIR}/dependency/lib-vc2022)
 
-add_executable(OpenGLTest ${native_srcs} ${SRC_LIST})
+add_executable(OpenGLTest ${native_srcs} ${SRC_LIST} ${native_headers})
 
 target_link_libraries(OpenGLTest glfw3)
 
