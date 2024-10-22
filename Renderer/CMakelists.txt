@@ -11,26 +11,37 @@ ExternalProject_Add(
     SOURCE_DIR ${GLM_SOURCE_DIR}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/glm/install
 )
-# include header
 ExternalProject_Get_Property(glm install_dir)
-include_directories(${install_dir}/install/include)
-set(INC_DIR ${CMAKE_SOURCE_DIR}/dependency/include)
+set(glm_install_dir ${install_dir})
+
+#install glfw
+set(GLFW_SOURCE_DIR ${CMAKE_SOURCE_DIR}/dependency/glfw)
+ExternalProject_Add(
+    glfw3
+    PREFIX ${CMAKE_BINARY_DIR}/glfw
+    SOURCE_DIR ${GLFW_SOURCE_DIR}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/glfw3/install
+)
+ExternalProject_Get_Property(glfw3 install_dir)
+set(glfw3_install_dir ${install_dir})
+
+
+# include header
+include_directories(${glm_install_dir}/install/include)
+include_directories(${glfw3_install_dir}/install/include)
+set(INC_DIR ${CMAKE_SOURCE_DIR}/dependency/glad/include)
 include_directories(${INC_DIR} "./include")
 include_directories(${CMAKE_SOURCE_DIR}/dependency/stb)
 
-# 设置输出目录为可执行文件同级目录
+# set binary runnable dir
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/$<0:>")
 
 file(GLOB_RECURSE native_srcs ./src/*.cpp)
 file(GLOB_RECURSE native_headers ./src/*.h)
-
-set(SRC_LIST ${CMAKE_SOURCE_DIR}/dependency/src/glad.c)
-
-# TODO: compile glfw
-link_directories(${CMAKE_SOURCE_DIR}/dependency/lib-vc2022)
+set(SRC_LIST ${CMAKE_SOURCE_DIR}/dependency/glad/src/glad.c)
 
 add_executable(OpenGLTest ${native_srcs} ${SRC_LIST} ${native_headers})
 
-target_link_libraries(OpenGLTest glfw3)
-
+add_dependencies(OpenGLTest glfw3)
 add_dependencies(OpenGLTest glm)
+target_link_libraries(OpenGLTest ${glfw3_install_dir}/install/lib/glfw3.lib)
